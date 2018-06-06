@@ -12,9 +12,20 @@
 #import <React/RCTConvert.h>
 #import <React/RCTEventDispatcher.h>
 
+@interface UMShareModule()
+@property (nonatomic, strong) NSMutableArray *platform;
+@end
+
 @implementation UMShareModule
 
 RCT_EXPORT_MODULE();
+
+- (NSMutableArray *)platform{
+  if (!_platform) {
+    _platform = [NSMutableArray array];
+  }
+  return _platform;
+}
 
 - (dispatch_queue_t)methodQueue
 {
@@ -252,14 +263,20 @@ RCT_EXPORT_METHOD(auth:(NSInteger)platform completion:(RCTResponseSenderBlock)co
   
 }
 
-RCT_EXPORT_METHOD(isInstall:(NSInteger)platform completion:(RCTResponseSenderBlock)completion){
-  if ([[UMSocialManager defaultManager] isInstall:platform]) {
-    completion(@[[NSNull null], @"1"]);
+RCT_EXPORT_METHOD(checkPlatform:(NSArray *)platform
+                       resolver:(RCTResponseSenderBlock)callback)
+{
+  self.platform = [platform mutableCopy];
+  NSMutableArray *platArray = [NSMutableArray array];
+  for (NSInteger i = 0; i < self.platform.count; i++) {
+    NSInteger type = [self.platform[i] integerValue];
+    BOOL result = [[UMSocialManager defaultManager] isInstall:type];
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    [dic setObject:[NSString stringWithFormat:@"%ld",i] forKey:@"index"];
+    [dic setObject:[NSString stringWithFormat:@"%d",result] forKey:@"isAllow"];
+    [platArray addObject:dic];
   }
-  else {
-    completion(@[[NSNull null], @"0"]);
-  }
-  
+  callback(@[[NSNull null], platArray]);
 }
 
 
