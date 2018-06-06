@@ -5,7 +5,7 @@
 # 安装
 > npm i react-native-sf-umshare
 
-> 下载github上 sfshare并拽入IOS项目的target中(桥接文件)
+> 下载github上 SFShare并拽入IOS项目的target中(桥接文件)
 
 # JS代码示例
 ```
@@ -24,7 +24,7 @@ const instructions = Platform.select({
     android: 'Double tap R on your keyboard to reload,\n' +
     'Shake or press menu button for dev menu',
 });
-import {SFUmShareUI,SFUM} from 'react-native-sf-umshare'
+import {SFUmShareUI,SFUmShare} from 'react-native-sf-umshare'
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -32,7 +32,18 @@ export default class App extends Component<Props> {
         return (
             <View style={styles.container}>
                 <Text style={styles.welcome} onPress={() => {
-                    this.share.setVisiable(true)
+                    var param1 = {
+                        text: '我是谁1',
+                        icon: 'http://kplan.oss-cn-shanghai.aliyuncs.com/header/2017-11-27_1511778896586',
+                        url: 'http://kplan.oss-cn-shanghai.aliyuncs.com/header/2017-11-27_1511778896586',
+                        title: '我在哪1',
+                    }
+                    this.ShareUI.share(param1,(result) =>{
+                        console.log(result)
+                    })
+                    
+                    
+                    
                 }}>
                     Welcome to React Native!
                 </Text>
@@ -44,7 +55,6 @@ export default class App extends Component<Props> {
                 </Text>
                 <SFUmShareUI
                     ref={(ref) => this.share = ref}
-                    onShare={(i, isLast) => this.clickItem(i, isLast)}
                     platArray={['QQ', 'WechatSession', 'WechatTimeLine', 'WechatFavorite', 'Qzone', 'Facebook']}/>
             </View>
         );
@@ -106,9 +116,9 @@ const styles = StyleSheet.create({
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import <UMCommon/UMCommon.h>
+#import "UMShare.h"
 
-#import <UMShare/UMShare.h>
-#import "RNUMConfigure.h"
 
 @implementation AppDelegate
 
@@ -130,7 +140,7 @@ const styles = StyleSheet.create({
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   
-  [RNUMConfigure initWithAppkey:@"5ac479118f4a9d4acf0000f5" channel:@"App Store"];
+  [UMConfigure initWithAppkey:@"5ac479118f4a9d4acf0000f5" channel:@"App Store"];
   [self configUSharePlatforms];
   
   return YES;
@@ -139,44 +149,36 @@ const styles = StyleSheet.create({
 
 - (void)configUSharePlatforms
 {
- //平台设置 appkey
-  [[UMSocialManager defaultManager] setPlaform:UMSocialPlatformType_WechatSession appKey:@"" appSecret:@"" redirectURL:@"http://mobile.umeng.com/social"];
-  [[UMSocialManager defaultManager] setPlaform:UMSocialPlatformType_QQ appKey:@""/*设置QQ平台的appID*/  appSecret:nil redirectURL:@"http://mobile.umeng.com/social"];
-  [[UMSocialManager defaultManager] setPlaform:UMSocialPlatformType_Sina appKey:@""  appSecret:nil redirectURL:@"https://sns.whalecloud.com/sina2/callback"];
+  [UMShare setPlatforms:UMSocialPlatformType_WechatSession appKey:@"wx852d43a16b2af151" appSecret:@"423f56cbcdd97217a44352805cb1f410" redirectURL:@"http://mobile.umeng.com/social"];
+  [UMShare setPlatforms:UMSocialPlatformType_QQ appKey:@"1104484470" appSecret:nil redirectURL:@"http://mobile.umeng.com/social"];
+  [UMShare setPlatforms:UMSocialPlatformType_Sina appKey:@"1601664396" appSecret:nil redirectURL:@"http://mobile.umeng.com/social"];
 }
 
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
   //6.3的新的API调用，是为了兼容国外平台(例如:新版facebookSDK,VK等)的调用[如果用6.2的api调用会没有回调],对国内平台没有影响
-  BOOL result = [[UMSocialManager defaultManager] handleOpenURL:url sourceApplication:sourceApplication annotation:annotation];
-  if (!result) {
-    // 其他如支付等SDK的回调
-  }
+  BOOL result = [UMShare setHandelURL:url sourceApplication:sourceApplication annotation:annotation];
   return result;
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
 {
   //6.3的新的API调用，是为了兼容国外平台(例如:新版facebookSDK,VK等)的调用[如果用6.2的api调用会没有回调],对国内平台没有影响
-  BOOL result = [[UMSocialManager defaultManager]  handleOpenURL:url options:options];
-  if (!result) {
-    // 其他如支付等SDK的回调
-  }
+  BOOL result = [UMShare setHandelURL:url options:options];
   return result;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
 {
-  BOOL result = [[UMSocialManager defaultManager] handleOpenURL:url];
-  if (!result) {
-    // 其他如支付等SDK的回调
-  }
+  BOOL result = [UMShare setHandelURL:url];
+
   return result;
 }
 
 
 @end
+
 
 ```
 
