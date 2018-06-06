@@ -56,7 +56,7 @@ export default class App extends Component<Props> {
         else {
             var dic = {
                 index: i,
-                img: 'http://kplan.oss-cn-shanghai.aliyuncs.com/header/2017-11-27_1511778896586',
+                icon: 'http://kplan.oss-cn-shanghai.aliyuncs.com/header/2017-11-27_1511778896586',
                 text: 'text',
                 url: 'http://kplan.oss-cn-shanghai.aliyuncs.com/header/2017-11-27_1511778896586',
                 title: 'title',
